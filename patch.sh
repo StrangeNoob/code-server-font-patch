@@ -1,25 +1,32 @@
 #!/bin/bash
-if [ -z $1 ]; then
+
+# Determine code-server path
+if [ -z "$1" ]; then
   CODE_SERVER_PATH="/app/code-server"
 else
   CODE_SERVER_PATH="$1"
 fi
 
+# Define paths
 WORKBENCH_PATH="$CODE_SERVER_PATH/lib/vscode/out/vs/workbench"
-WORKBENCH_CSS_PATH="$CODE_SERVER_PATH/lib/vscode/out/vs/workbench/workbench.web.main.css"
+HTML_TEMPLATE_PATH="$CODE_SERVER_PATH/lib/vscode/out/vs/code/browser/workbench/workbench.html"
+STYLE_HTML_PATH="./resources/style.html"
 
-# Check if it is valid path
-if [ -z "$CODE_SERVER_PATH" -o ! -d "$WORKBENCH_PATH" ]; then
-  echo "Please give valid code-server path!"
+# Validate code-server path
+if [ ! -d "$WORKBENCH_PATH" ]; then
+  echo "Invalid code-server path: $CODE_SERVER_PATH"
   exit 1
 fi
 
-if ! grep -q "/* ::CUSTOM VSCODE FONTS:: */" "$WORKBENCH_CSS_PATH"; then
-  # Copy fonts to $WORKBENCH_PATH
-  cp -rn ./resources/fonts "$WORKBENCH_PATH/"
+# Check if custom fonts are already included
+if ! grep -q "/* ::CUSTOM VSCODE FONTS:: */" "$HTML_TEMPLATE_PATH"; then
+  # Copy fonts to workbench directory
+  cp --recursive --update=none ./resources/fonts "$WORKBENCH_PATH/"
 
-  # Prepend fonts.css to workbench.web.api.css
-  cat ./resources/fonts.css >> $WORKBENCH_CSS_PATH
+  # Append style.html content to the HTML template
+  sed -i '/<\/head>/i <link rel="stylesheet" type="text/css" href="./resources/style.html">' "$HTML_TEMPLATE_PATH"
 fi
 
-echo "Done! Have fun!"
+echo "Custom fonts have been integrated successfully."
+
+
