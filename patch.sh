@@ -1,12 +1,12 @@
 #!/bin/bash
 if [ -z $1 ]; then
-  CODE_SERVER_PATH="/usr/lib/code-server"
+  CODE_SERVER_PATH="/app/code-server"
 else
   CODE_SERVER_PATH="$1"
 fi
 
 WORKBENCH_PATH="$CODE_SERVER_PATH/lib/vscode/out/vs/workbench"
-WORKBENCH_CSS_PATH="$WORKBENCH_PATH/workbench.web.main.css"
+WORKBENCH_CSS_PATH="$CODE_SERVER_PATH/lib/vscode/out/vs/workbench/workbench.web.main.css"
 
 # Check if it is valid path
 if [ -z "$CODE_SERVER_PATH" -o ! -d "$WORKBENCH_PATH" ]; then
