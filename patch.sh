@@ -10,7 +10,8 @@ fi
 # Define paths
 WORKBENCH_PATH="$CODE_SERVER_PATH/lib/vscode/out/vs/workbench"
 HTML_TEMPLATE_PATH="$CODE_SERVER_PATH/lib/vscode/out/vs/code/browser/workbench/workbench.html"
-STYLE_HTML_PATH="./resources/style.html"
+
+CUSTOM_FONTS_CSS="./resources/custom-font.css"
 
 # Validate code-server path
 if [ ! -d "$WORKBENCH_PATH" ]; then
@@ -23,8 +24,15 @@ if ! grep -q "/* ::CUSTOM VSCODE FONTS:: */" "$HTML_TEMPLATE_PATH"; then
   # Copy fonts to workbench directory
   cp --recursive --update=none ./resources/fonts "$WORKBENCH_PATH/"
 
-  # Append style.html content to the HTML template
-  sed -i '/<\/head>/i <link rel="stylesheet" type="text/css" href="./resources/style.html">' "$HTML_TEMPLATE_PATH"
+  awk -v css="$(cat "$CUSTOM_FONTS_CSS")" '
+    /<\/head>/ {
+      print "<style>"
+      print "/* ::CUSTOM VSCODE FONTS:: */"
+      print css
+      print "</style>"
+    }
+    { print }
+  ' "$HTML_TEMPLATE_PATH" > "${HTML_TEMPLATE_PATH}.tmp" && mv "${HTML_TEMPLATE_PATH}.tmp" "$HTML_TEMPLATE_PATH"
 fi
 
 echo "Custom fonts have been integrated successfully."
